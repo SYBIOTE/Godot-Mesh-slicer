@@ -10,8 +10,8 @@ play the demo scene to destroy the cube
 ## Use
 
 Once you download/copy the slicer file into your project.  
-There will a new node under rigid body called , sliceble.  
-The sliceable object needs a mesh instance with mesh   
+There will a new node under rigid body called , sliceable.  
+The sliceable node needs a mesh instance with mesh   
 and a empty collision shape under it to function.     
 Provide a cutting plane to the cut_object function (in world space).   
 This will cut the rigid body into two rigidbodies.    
