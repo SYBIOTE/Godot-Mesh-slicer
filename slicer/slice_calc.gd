@@ -84,7 +84,6 @@ func _set_mesh(side):
 					am.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,mesh_array)
 				_negativeSideMesh = am              
 func _compute_mesh():
-	print("computing")
 	if _mesh.mesh.get_surface_count() >0:
 		for j in range(_mesh.mesh.get_surface_count()):
 			_current_surf_idx = j

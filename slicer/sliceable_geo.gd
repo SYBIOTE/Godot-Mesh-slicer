@@ -1,6 +1,6 @@
 extends RigidBody
 class_name sliceable
-export (int, 1, 3)var delete_at_children = 3 
+export (int, 1, 10)var delete_at_children = 3 
 export (int,LAYERS_3D_PHYSICS) var _cut_body_collision_layer
 export (int,LAYERS_3D_PHYSICS) var _cut_body_collision_mask
 export var _cut_body_gravity_scale:float
@@ -39,7 +39,7 @@ func _create_cut_body(_sign,mesh_instance,cutplane : Plane):
 	object.mesh = mesh_instance
 	object.scale = _mesh.scale
 	if _mesh.mesh.get_surface_count() > 0:
-		print(_mesh.mesh.get_surface_count())
+#		print(_mesh.mesh.get_surface_count())
 		for i in range(_mesh.mesh.get_surface_count()):
 			var mat = _mesh.mesh.surface_get_material(i)
 			object.mesh.surface_set_material(i,mat)
