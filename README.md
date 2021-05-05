@@ -3,7 +3,8 @@
 scripts to cut mesh / rigid bodies in godot at runtime implemented in GDscript
 
 
-showcase : https://www.youtube.com/watch?v=ynZVK_XyaRc
+showcase : https://www.youtube.com/watch?v=ynZVK_XyaRc.  
+play the demo scene to destroy the cube 
 ![Screenshot 2021-05-05 at 10 56 54 PM](https://user-images.githubusercontent.com/54761979/117183645-66e7eb80-adf5-11eb-89b6-728219f4b59c.png)
 ![Screenshot 2021-05-05 at 10 57 54 PM](https://user-images.githubusercontent.com/54761979/117183652-6a7b7280-adf5-11eb-9b17-09e449a973da.png)
 ## Use
