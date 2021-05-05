@@ -36,7 +36,6 @@ func _create_cut_body(_sign,mesh_instance,cutplane : Plane):
 	rigid_body_half.global_transform = global_transform;
 	#create mesh
 	var object = MeshInstance.new()
-	print("original mesh is ",_mesh.mesh)
 	object.mesh = mesh_instance
 	object.scale = _mesh.scale
 	if _mesh.mesh.get_surface_count() > 0:
@@ -58,10 +57,10 @@ func _create_cut_body(_sign,mesh_instance,cutplane : Plane):
 	get_parent().add_child(rigid_body_half)
 func cut_object(cutplane:Plane):
 	var slices = slice_calculator.new(cutplane,_mesh,true)
-#	print("+ve mesh is ",slices.get_PositiveSideMesh())
-#	print("-ve mesh is ",slices.get_NegativeSideMesh())
-	_create_cut_body(-1,slices.get_NegativeSideMesh(),cutplane);
-	_create_cut_body( 1,slices.get_PositiveSideMesh(),cutplane);
+#	print("+ve mesh is ",slices.negative_mesh())
+#	print("-ve mesh is ",slices.positive_mesh())
+	_create_cut_body(-1,slices.negative_mesh(),cutplane);
+	_create_cut_body( 1,slices.positive_mesh(),cutplane);
 	queue_free();
 func _get_configuration_warning():
 		var warning = PoolStringArray()
