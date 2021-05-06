@@ -5,6 +5,8 @@ export (int,LAYERS_3D_PHYSICS) var _cut_body_collision_layer
 export (int,LAYERS_3D_PHYSICS) var _cut_body_collision_mask
 export var _cut_body_gravity_scale:float
 export (Material)var _cross_section_material =  null
+export var _apply_force_on_cut:bool = false
+export var _normal_force_on_cut:float  = 1
 var _current_child_number = 0
 var _mesh:MeshInstance = null
 var _collider:CollisionShape = null
@@ -44,10 +46,9 @@ func _create_cut_body(_sign,mesh_instance,cutplane : Plane):
 #		print(_mesh.mesh.get_surface_count())
 		var material_count
 		if _cross_section_material != null:
-			 material_count= _mesh.mesh.get_surface_count() +1
+			 material_count= _mesh.mesh.get_surface_count()+1
 		else:
 			 material_count= _mesh.mesh.get_surface_count()
-		print(material_count)
 		for i in range(material_count):
 			var mat 
 			if i == material_count -1 and _cross_section_material != null:
@@ -67,8 +68,10 @@ func _create_cut_body(_sign,mesh_instance,cutplane : Plane):
 	rigid_body_half._current_child_number = _current_child_number+1 
 	rigid_body_half.delete_at_children =  delete_at_children
 	rigid_body_half._cross_section_material = _cross_section_material
+	rigid_body_half._normal_force_on_cut = _normal_force_on_cut
 	get_parent().add_child(rigid_body_half)
-#	rigid_body_half.apply_central_impulse(_sign*cutplane.normal*5)
+	if _apply_force_on_cut:
+		rigid_body_half.apply_central_impulse(_sign*cutplane.normal*_normal_force_on_cut)
 func cut_object(cutplane:Plane):
 	#  there are a lot of parameters for the constructor
 	#  cutplane = plane to cut mesh with , in global space

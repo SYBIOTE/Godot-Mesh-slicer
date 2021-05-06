@@ -3,38 +3,37 @@
 [ext_resource path="res://slicer/sliceable_geo.gd" type="Script" id=1]
 [ext_resource path="res://demo/slicer.gd" type="Script" id=2]
 
-[sub_resource type="SpatialMaterial" id=10]
+[sub_resource type="SpatialMaterial" id=1]
 params_cull_mode = 2
 albedo_color = Color( 0, 0.909804, 1, 1 )
 
-[sub_resource type="SpatialMaterial" id=13]
+[sub_resource type="SpatialMaterial" id=2]
 flags_vertex_lighting = true
 vertex_color_use_as_albedo = true
 vertex_color_is_srgb = true
 params_cull_mode = 2
 albedo_color = Color( 1, 0, 0, 1 )
 
-[sub_resource type="CubeMesh" id=12]
-material = SubResource( 13 )
+[sub_resource type="CubeMesh" id=3]
+material = SubResource( 2 )
 
-[sub_resource type="ConvexPolygonShape" id=3]
+[sub_resource type="ConvexPolygonShape" id=4]
 points = PoolVector3Array( -1, 1, 1, 1, 1, -1, 1, 1, 1, -1, 1, -1, -1, -1, 1, 1, -1, -1, 1, -1, 1, -1, -1, -1, 1, 1, 1, -1, 1, -1, 1, 1, -1, -1, 1, 1, 1, -1, 1, -1, -1, -1, 1, -1, -1, -1, -1, 1, 1, 1, 1, -1, -1, 1, -1, 1, 1, 1, -1, 1, 1, 1, -1, -1, -1, -1, -1, 1, -1, 1, -1, -1 )
 
-[sub_resource type="SpatialMaterial" id=4]
+[sub_resource type="SpatialMaterial" id=5]
 emission_enabled = true
 emission = Color( 0, 1, 0.858824, 1 )
 emission_energy = 1.0
 emission_operator = 0
 emission_on_uv2 = false
 
-[sub_resource type="PlaneMesh" id=5]
-material = SubResource( 4 )
+[sub_resource type="PlaneMesh" id=6]
+material = SubResource( 5 )
 
-[sub_resource type="ConvexPolygonShape" id=6]
+[sub_resource type="ConvexPolygonShape" id=7]
 points = PoolVector3Array( 1, 0, 1, -1, 0, 1, 1, 0, -1, -1, 0, -1 )
 
-[sub_resource type="Animation" id=7]
-resource_name = "cut"
+[sub_resource type="Animation" id=8]
 length = 4.0
 tracks/0/type = "value"
 tracks/0/path = NodePath("Area:translation")
@@ -61,7 +60,7 @@ tracks/1/keys = {
 "values": [ Vector3( 0, 0, -30 ), Vector3( 0, 0, -44.482 ), Vector3( 0, 0, 39.769 ), Vector3( 0, 0, 39.769 ), Vector3( -14.8012, -30.1898, -23.707 ), Vector3( -18.5249, -53.4624, -16.1213 ), Vector3( -18.5249, -53.4624, -16.1213 ), Vector3( 14.014, -62.615, -15.7452 ), Vector3( 0, 0, -44.482 ) ]
 }
 
-[sub_resource type="Animation" id=11]
+[sub_resource type="Animation" id=9]
 resource_name = "top_cut"
 tracks/0/type = "value"
 tracks/0/path = NodePath("Area:translation")
@@ -76,10 +75,10 @@ tracks/0/keys = {
 "values": [ Vector3( 5, 1, 0 ), Vector3( -5, 1, 0 ) ]
 }
 
-[sub_resource type="ConcavePolygonShape" id=8]
+[sub_resource type="ConcavePolygonShape" id=10]
 data = PoolVector3Array( 10, 0, 10, -10, 0, 10, 10, 0, -10, -10, 0, 10, -10, 0, -10, 10, 0, -10 )
 
-[sub_resource type="PlaneMesh" id=9]
+[sub_resource type="PlaneMesh" id=11]
 size = Vector2( 20, 20 )
 
 [node name="env" type="Spatial"]
@@ -94,21 +93,23 @@ delete_at_children = 10
 _cut_body_collision_layer = 1
 _cut_body_collision_mask = 1
 _cut_body_gravity_scale = 1.0
-_cross_section_material = SubResource( 10 )
+_cross_section_material = SubResource( 1 )
+_apply_force_on_cut = true
+_normal_force_on_cut = 5.0
 
 [node name="MeshInstance" type="MeshInstance" parent="sliceable"]
-mesh = SubResource( 12 )
+mesh = SubResource( 3 )
 material/0 = null
 
 [node name="CollisionShape" type="CollisionShape" parent="sliceable"]
-shape = SubResource( 3 )
+shape = SubResource( 4 )
 
 [node name="Area" type="Area" parent="."]
 transform = Transform( 0.999999, 0, 0, 0, 0.999999, 0, 0, 0, 0.999999, 0, 1.126, 5 )
 script = ExtResource( 2 )
 
 [node name="mesh" type="MeshInstance" parent="Area"]
-mesh = SubResource( 5 )
+mesh = SubResource( 6 )
 material/0 = null
 
 [node name="A" type="Position3D" parent="Area/mesh"]
@@ -122,21 +123,21 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -1 )
 
 [node name="CollisionShape" type="CollisionShape" parent="Area"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.361122, -0.300545, 0 )
-shape = SubResource( 6 )
+shape = SubResource( 7 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 autoplay = "cut"
-anims/cut = SubResource( 7 )
-anims/top_cut = SubResource( 11 )
+anims/cut = SubResource( 8 )
+anims/top_cut = SubResource( 9 )
 
 [node name="StaticBody" type="StaticBody" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0217474, 0, 0.00477123 )
 
 [node name="CollisionShape" type="CollisionShape" parent="StaticBody"]
-shape = SubResource( 8 )
+shape = SubResource( 10 )
 
 [node name="MeshInstance" type="MeshInstance" parent="StaticBody"]
-mesh = SubResource( 9 )
+mesh = SubResource( 11 )
 material/0 = null
 
 [node name="DirectionalLight" type="DirectionalLight" parent="."]
