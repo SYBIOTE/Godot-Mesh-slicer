@@ -4,9 +4,11 @@ export (int, 1, 10)var delete_at_children = 3
 export (int,LAYERS_3D_PHYSICS) var _cut_body_collision_layer
 export (int,LAYERS_3D_PHYSICS) var _cut_body_collision_mask
 export var _cut_body_gravity_scale:float
+export (Material)var _cross_section_material =  null
 var _current_child_number = 0
 var _mesh:MeshInstance = null
 var _collider:CollisionShape = null
+
 func _ready():
 	for child in get_children():
 		if child is MeshInstance:
@@ -40,8 +42,18 @@ func _create_cut_body(_sign,mesh_instance,cutplane : Plane):
 	object.scale = _mesh.scale
 	if _mesh.mesh.get_surface_count() > 0:
 #		print(_mesh.mesh.get_surface_count())
-		for i in range(_mesh.mesh.get_surface_count()):
-			var mat = _mesh.mesh.surface_get_material(i)
+		var material_count
+		if _cross_section_material != null:
+			 material_count= _mesh.mesh.get_surface_count() +1
+		else:
+			 material_count= _mesh.mesh.get_surface_count()
+		print(material_count)
+		for i in range(material_count):
+			var mat 
+			if i == material_count -1 and _cross_section_material != null:
+				mat = _cross_section_material
+			else:
+				mat = _mesh.mesh.surface_get_material(i)
 			object.mesh.surface_set_material(i,mat)
 	#create collider 
 	var coll = CollisionShape.new()
@@ -54,9 +66,19 @@ func _create_cut_body(_sign,mesh_instance,cutplane : Plane):
 	rigid_body_half._cut_body_gravity_scale = _cut_body_gravity_scale
 	rigid_body_half._current_child_number = _current_child_number+1 
 	rigid_body_half.delete_at_children =  delete_at_children
+	rigid_body_half._cross_section_material = _cross_section_material
 	get_parent().add_child(rigid_body_half)
+	rigid_body_half.apply_central_impulse(_sign*cutplane.normal*5)
 func cut_object(cutplane:Plane):
-	var slices = slice_calculator.new(cutplane,_mesh,true)
+	#  there are a lot of parameters for the constructor
+	#  cutplane:
+	#  _mesh
+	#	
+	#
+	#
+	#
+	#
+	var slices = slice_calculator.new(cutplane,_mesh,_cross_section_material,true)
 #	print("+ve mesh is ",slices.negative_mesh())
 #	print("-ve mesh is ",slices.positive_mesh())
 	_create_cut_body(-1,slices.negative_mesh(),cutplane);

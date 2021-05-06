@@ -1,15 +1,21 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=14 format=2]
 
 [ext_resource path="res://slicer/sliceable_geo.gd" type="Script" id=1]
 [ext_resource path="res://demo/slicer.gd" type="Script" id=2]
 
-[sub_resource type="SpatialMaterial" id=1]
+[sub_resource type="SpatialMaterial" id=10]
+params_cull_mode = 2
+albedo_color = Color( 0, 0.909804, 1, 1 )
+
+[sub_resource type="SpatialMaterial" id=13]
 flags_vertex_lighting = true
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
 params_cull_mode = 2
 albedo_color = Color( 1, 0, 0, 1 )
 
-[sub_resource type="CubeMesh" id=2]
-material = SubResource( 1 )
+[sub_resource type="CubeMesh" id=12]
+material = SubResource( 13 )
 
 [sub_resource type="ConvexPolygonShape" id=3]
 points = PoolVector3Array( -1, 1, 1, 1, 1, -1, 1, 1, 1, -1, 1, -1, -1, -1, 1, 1, -1, -1, 1, -1, 1, -1, -1, -1, 1, 1, 1, -1, 1, -1, 1, 1, -1, -1, 1, 1, 1, -1, 1, -1, -1, -1, 1, -1, -1, -1, -1, 1, 1, 1, 1, -1, -1, 1, -1, 1, 1, 1, -1, 1, 1, 1, -1, -1, -1, -1, -1, 1, -1, 1, -1, -1 )
@@ -29,7 +35,6 @@ points = PoolVector3Array( 1, 0, 1, -1, 0, 1, 1, 0, -1, -1, 0, -1 )
 
 [sub_resource type="Animation" id=7]
 resource_name = "cut"
-length = 4.0
 tracks/0/type = "value"
 tracks/0/path = NodePath("Area:translation")
 tracks/0/interp = 1
@@ -52,7 +57,22 @@ tracks/1/keys = {
 "times": PoolRealArray( 0, 0.9, 1.2, 2, 2.4, 2.7, 2.9, 3.4, 4 ),
 "transitions": PoolRealArray( 1, 1, 1, 1, 1, 1, 1, 1, 1 ),
 "update": 0,
-"values": [ Vector3( 0, 0, -44.482 ), Vector3( 0, 0, -44.482 ), Vector3( 0, 0, 39.769 ), Vector3( 0, 0, 39.769 ), Vector3( -14.8012, -30.1898, -23.707 ), Vector3( -18.5249, -53.4624, -16.1213 ), Vector3( -18.5249, -53.4624, -16.1213 ), Vector3( 14.014, -62.615, -15.7452 ), Vector3( 0, 0, -44.482 ) ]
+"values": [ Vector3( 0, 0, -30 ), Vector3( 0, 0, -44.482 ), Vector3( 0, 0, 39.769 ), Vector3( 0, 0, 39.769 ), Vector3( -14.8012, -30.1898, -23.707 ), Vector3( -18.5249, -53.4624, -16.1213 ), Vector3( -18.5249, -53.4624, -16.1213 ), Vector3( 14.014, -62.615, -15.7452 ), Vector3( 0, 0, -44.482 ) ]
+}
+
+[sub_resource type="Animation" id=11]
+resource_name = "top_cut"
+tracks/0/type = "value"
+tracks/0/path = NodePath("Area:translation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Vector3( 5, 1, 0 ), Vector3( -5, 1, 0 ) ]
 }
 
 [sub_resource type="ConcavePolygonShape" id=8]
@@ -64,45 +84,46 @@ size = Vector2( 20, 20 )
 [node name="env" type="Spatial"]
 
 [node name="Camera" type="Camera" parent="."]
-transform = Transform( 1, 0, 0, 0, 0.939693, 0.34202, 0, -0.34202, 0.939693, 0, 2.47633, 3.4368 )
+transform = Transform( 1, 0, 0, 0, 0.27708, 0.960847, 0, -0.960847, 0.27708, 0, 5.72898, 0.974048 )
 
 [node name="sliceable" type="RigidBody" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.14219, -1.86862 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0 )
 script = ExtResource( 1 )
 delete_at_children = 10
 _cut_body_collision_layer = 1
 _cut_body_collision_mask = 1
-_cut_body_gravity_scale = 1.0
+_cut_body_gravity_scale = 2.0
+_cross_section_material = SubResource( 10 )
 
 [node name="MeshInstance" type="MeshInstance" parent="sliceable"]
-mesh = SubResource( 2 )
+mesh = SubResource( 12 )
 material/0 = null
 
 [node name="CollisionShape" type="CollisionShape" parent="sliceable"]
 shape = SubResource( 3 )
 
 [node name="Area" type="Area" parent="."]
-transform = Transform( 0.71347, 0.700685, 0, -0.700685, 0.71347, 0, 0, 0, 0.999999, 0, 1.12632, 1.13555 )
+transform = Transform( 0.999999, 0, 0, 0, -4.37113e-08, -0.999999, 0, 0.999999, -4.37113e-08, -5, 1, 0 )
 script = ExtResource( 2 )
 
 [node name="mesh" type="MeshInstance" parent="Area"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 )
 mesh = SubResource( 5 )
 material/0 = null
 
 [node name="tip" type="Position3D" parent="Area/mesh"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.986257 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1 )
 
 [node name="base" type="Position3D" parent="Area/mesh"]
-transform = Transform( 1, 0, 0, 2.98023e-08, 1, 0, 0, 0, 1, 0.907444, 1.19209e-07, 0.99069 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -1 )
 
 [node name="CollisionShape" type="CollisionShape" parent="Area"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.361122, -0.300545, 0 )
 shape = SubResource( 6 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-autoplay = "cut"
+autoplay = "top_cut"
 anims/cut = SubResource( 7 )
+anims/top_cut = SubResource( 11 )
 
 [node name="StaticBody" type="StaticBody" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0217474, 0, 0.00477123 )

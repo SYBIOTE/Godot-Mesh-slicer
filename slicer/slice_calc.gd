@@ -2,7 +2,8 @@ class_name slice_calculator
 
 enum MeshSide{
 	Positive = 0,
-	Negative = 1}
+	Negative = 1
+	OnPlane =2}
 
 var _surfaceCount
 
@@ -19,18 +20,35 @@ var _negativeSideUvs;
 var _negativeSideNormals;
 
 var _pointsAlongPlane;
+var _onplaneSideVertices;
+var _onplaneSideTriangles;
+var _onplaneSideUvs;
+var _onplaneSideNormals;
+
 var _plane:Plane;
 var _mesh:MeshInstance;
-var _isSolid:bool ;
+var _cross_section_material:bool = false;
+
+var _isSolid:bool;
 var _useSharedVertices:bool;
 var _smoothVertices:bool ;
-var _createReverseTriangleWindings:bool ;
-var _current_surf_idx
-var _origin
-var _scale
+var _createReverseTriangleWindings:bool;
+var _current_surf_idx:int
+var _origin:Vector3
+var _scale:Vector3
 
-func _init(plane:Plane , mesh:MeshInstance, isSolid:bool = true, createReverseTriangleWindings:bool = false,shareVertices:bool = false, smoothVertices:bool =false):
-	_surfaceCount = mesh.mesh.get_surface_count()
+func _init(plane:Plane , mesh:MeshInstance, cross_section_material:Material= null ,isSolid:bool = true, createReverseTriangleWindings:bool = false,shareVertices:bool = false, smoothVertices:bool =false):
+	if cross_section_material != null:
+		_cross_section_material = true
+		_isSolid = true
+		_onplaneSideVertices = [];
+		_onplaneSideTriangles= [];
+		_onplaneSideUvs=[];
+		_onplaneSideNormals=[];
+	if _cross_section_material:
+		_surfaceCount = mesh.mesh.get_surface_count()+1
+	else:
+		_surfaceCount = mesh.mesh.get_surface_count()
 	_current_surf_idx = 0 
 	_positiveSideTriangles= []; 
 	_positiveSideVertices = [];
@@ -64,25 +82,36 @@ func _set_mesh(side):
 	var am = ArrayMesh.new()
 	var mesh_array = []
 	mesh_array.resize(ArrayMesh.ARRAY_MAX)
-	if _mesh.mesh.get_surface_count() >0:
-			if (side == MeshSide.Positive):
-				for j in range(_mesh.mesh.get_surface_count()):
-					mesh_array[Mesh.ARRAY_VERTEX] = PoolVector3Array(_positiveSideVertices[j]);
-					mesh_array[Mesh.ARRAY_INDEX]  = PoolIntArray(_positiveSideTriangles[j]);
-					mesh_array[Mesh.ARRAY_NORMAL] = PoolVector3Array(_positiveSideNormals[j]);
-					mesh_array[Mesh.ARRAY_TEX_UV]= PoolVector2Array(_positiveSideUvs[j]);
-#					print("positive mesh is ",mesh_array[0].size()," ",mesh_array[1].size()," ",mesh_array[4].size()," ",mesh_array[8].size())
-					am.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,mesh_array)
-				_positiveSideMesh = am            
-			else:
-				for j in range(_mesh.mesh.get_surface_count()):
-					mesh_array[Mesh.ARRAY_VERTEX] = PoolVector3Array(_negativeSideVertices[j]);
-					mesh_array[Mesh.ARRAY_INDEX] = PoolIntArray(_negativeSideTriangles[j]);
-					mesh_array[Mesh.ARRAY_NORMAL]  = PoolVector3Array(_negativeSideNormals[j]);
-					mesh_array[Mesh.ARRAY_TEX_UV]= PoolVector2Array(_negativeSideUvs[j]); 
+	if _surfaceCount > 0:
+#		print("in slice calc",_surfaceCount)
+		if (side == MeshSide.Positive):
+			for j in range(_surfaceCount):
+				mesh_array[Mesh.ARRAY_VERTEX] = PoolVector3Array(_positiveSideVertices[j]);
+				mesh_array[Mesh.ARRAY_INDEX]  = PoolIntArray(_positiveSideTriangles[j]);
+				mesh_array[Mesh.ARRAY_NORMAL] = PoolVector3Array(_positiveSideNormals[j]);
+				mesh_array[Mesh.ARRAY_TEX_UV]= PoolVector2Array(_positiveSideUvs[j]);
+#				print("positive mesh is ",mesh_array[0].size()," ",mesh_array[1].size()," ",mesh_array[4].size()," ",mesh_array[8].size())
+				if _cross_section_material and j == _surfaceCount-1:
+					mesh_array[Mesh.ARRAY_VERTEX] = PoolVector3Array(_onplaneSideVertices);
+					mesh_array[Mesh.ARRAY_INDEX]  = PoolIntArray(_onplaneSideTriangles);
+					mesh_array[Mesh.ARRAY_NORMAL] = PoolVector3Array(_onplaneSideNormals);
+					mesh_array[Mesh.ARRAY_TEX_UV]= PoolVector2Array(_onplaneSideUvs);
+				am.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,mesh_array)
+			_positiveSideMesh = am            
+		else:
+			for j in range(_surfaceCount):
+				mesh_array[Mesh.ARRAY_VERTEX] = PoolVector3Array(_negativeSideVertices[j]);
+				mesh_array[Mesh.ARRAY_INDEX] = PoolIntArray(_negativeSideTriangles[j]);
+				mesh_array[Mesh.ARRAY_NORMAL]  = PoolVector3Array(_negativeSideNormals[j]);
+				mesh_array[Mesh.ARRAY_TEX_UV]= PoolVector2Array(_negativeSideUvs[j]); 
 #					print("negative mesh is ",mesh_array[0].size()," ",mesh_array[1].size()," ",mesh_array[4].size()," ",mesh_array[8].size())
-					am.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,mesh_array)
-				_negativeSideMesh = am              
+				if _cross_section_material and j == _surfaceCount-1:
+					mesh_array[Mesh.ARRAY_VERTEX] = PoolVector3Array(_onplaneSideVertices);
+					mesh_array[Mesh.ARRAY_INDEX]  = PoolIntArray(_onplaneSideTriangles);
+					mesh_array[Mesh.ARRAY_NORMAL] = PoolVector3Array(_onplaneSideNormals);
+					mesh_array[Mesh.ARRAY_TEX_UV]= PoolVector2Array(_onplaneSideUvs);
+				am.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,mesh_array)
+			_negativeSideMesh = am              
 func _compute_mesh():
 	if _mesh.mesh.get_surface_count() >0:
 		for j in range(_mesh.mesh.get_surface_count()):
@@ -180,24 +209,30 @@ func _compute_mesh():
 	#					print("new triangle :sending ",intersection1,vert3,intersection2)
 						_set_mesh_side(side2,intersection1, null, intersection1Uv, (vert3-_origin)/_scale, null, uv3, intersection2, null, intersection2Uv, _useSharedVertices, false);
 	#					//push_back the newly created points on the plane.
+#						print("depositing at intersection points at ",_current_surf_idx)
 					_pointsAlongPlane[_current_surf_idx].push_back(intersection1);
 					_pointsAlongPlane[_current_surf_idx].push_back(intersection2);
-	#			//If the object is solid, join the new points along the plane otherwise do the reverse winding
-			if (_isSolid):_make_intersection_plane();
-			elif (_createReverseTriangleWindings):_add_reverse_winded_triangle();
-			if (_smoothVertices):_smooth_vertex();
+						
+		if _cross_section_material:
+			if (_isSolid):_make_intersection_plane_cross_section();
+		else:
+			for j in range(_mesh.mesh.get_surface_count()):
+				if (_isSolid):_make_intersection_plane();
+				elif (_createReverseTriangleWindings):_add_reverse_winded_triangle();
+				if (_smoothVertices):_smooth_vertex();
 func _set_mesh_side(side, vertex1, normal1, uv1, vertex2, normal2,  uv2, vertex3, normal3, uv3, shareVertices,addFirst):
 	if side == MeshSide.Positive:
 		_add_index_normal_uv(_positiveSideVertices[_current_surf_idx],_positiveSideTriangles[_current_surf_idx],_positiveSideNormals[_current_surf_idx],_positiveSideUvs[_current_surf_idx], vertex1, normal1, uv1, vertex2, normal2, uv2, vertex3, normal3, uv3, shareVertices, addFirst);
-	else:
+	elif side == MeshSide.Negative:
 		_add_index_normal_uv(_negativeSideVertices[_current_surf_idx],_negativeSideTriangles[_current_surf_idx],_negativeSideNormals[_current_surf_idx],_negativeSideUvs[_current_surf_idx], vertex1, normal1, uv1, vertex2, normal2, uv2, vertex3, normal3, uv3, shareVertices, addFirst);
+	else:
+		_add_index_normal_uv(_onplaneSideVertices,_onplaneSideTriangles,_onplaneSideNormals,_onplaneSideUvs, vertex1, normal1, uv1, vertex2, normal2, uv2, vertex3, normal3, uv3, shareVertices, addFirst);
 func _add_index_normal_uv(vertices,triangles,normals,uvs,vertex1,normal1,uv1,vertex2,normal2,uv2,vertex3,normal3,uv3,shareVertices,addFirst):
-	var tri1Index = vertices.find(vertex1);
 	if (addFirst):
 		_shift_triangle_index(triangles);
-#		//If a the vertex already exists we just push_back a triangle reference to it, if not push_back the vert to the list and then push_back the tri index
-	if (tri1Index > -1 and shareVertices):              
-		triangles.push_back(tri1Index);
+#	//If a the vertex already exists we just push_back a triangle reference to it, if not push_back the vert to the list and then push_back the triindex
+	var tri1Index = vertices.find(vertex1);
+	if (tri1Index > -1 and shareVertices):triangles.push_back(tri1Index);
 	else:
 		if (normal1 == null):
 			normal1 = _compute_normal(vertex1, vertex2, vertex3);                    
@@ -206,8 +241,7 @@ func _add_index_normal_uv(vertices,triangles,normals,uvs,vertex1,normal1,uv1,ver
 			i = 0;
 		_add_vertex_normal_uv(vertices,normals,uvs,triangles, vertex1,normal1, uv1, i);
 	var tri2Index = vertices.find(vertex2);
-	if (tri2Index > -1 and shareVertices):
-		triangles.push_back(tri2Index);
+	if (tri2Index > -1 and shareVertices):triangles.push_back(tri2Index);
 	else:
 		if (normal2 == null):
 			normal2 = _compute_normal(vertex2, vertex3, vertex1);
@@ -216,8 +250,7 @@ func _add_index_normal_uv(vertices,triangles,normals,uvs,vertex1,normal1,uv1,ver
 			i = 1;
 		_add_vertex_normal_uv(vertices,normals,uvs,triangles, vertex2,normal2, uv2, i);
 	var tri3Index = vertices.find(vertex3);
-	if (tri3Index > -1 and shareVertices):
-		triangles.push_back(tri3Index);
+	if (tri3Index > -1 and shareVertices):triangles.push_back(tri3Index);
 	else:            
 		if (normal3 == null):
 			normal3 = _compute_normal(vertex3, vertex1, vertex2);
@@ -244,8 +277,43 @@ func _shift_triangle_index(triangles):
 		triangles[j + 2] += 3;
 
 #intersection plane builders
+# cross section material applied
+func _make_intersection_plane_cross_section():
+#	print("_make_intersection_plane_cross_section")
+	var max_points_surface = 0
+	for i in _pointsAlongPlane.size():
+		if _pointsAlongPlane[i].size()>_pointsAlongPlane[max_points_surface].size():
+			max_points_surface = i
+	_pointsAlongPlane[_surfaceCount-1] = _pointsAlongPlane[max_points_surface]
+	var halfway = _get_plane_halfway_points_cross_section();
+	for i in range(0,_pointsAlongPlane[_surfaceCount-1].size(),2):
+		var firstVertex:Vector3 = _pointsAlongPlane[_surfaceCount-1][i];
+		var secondVertex:Vector3 = _pointsAlongPlane[_surfaceCount-1][i+1];
+		var normal3 = _compute_normal(halfway, secondVertex, firstVertex).normalized();
+#		print(firstVertex.round(),secondVertex.round(),halfway.round())
+		var direction = normal3.dot(_plane.normal);
+		_set_mesh_side(MeshSide.OnPlane, halfway, normal3, Vector2.ZERO, firstVertex, normal3, Vector2.ZERO, secondVertex, normal3, Vector2.ZERO, false, true);
+func _get_plane_halfway_points_cross_section():
+#	print("_get_plane_halfway_points_cross_section")
+	var distance 
+	if(_pointsAlongPlane[_surfaceCount-1].size() > 0):
+		distance =0
+		var firstPoint = _pointsAlongPlane[_surfaceCount-1][0];
+		var furthestPoint = Vector3.ZERO;
+		for point in _pointsAlongPlane[_surfaceCount-1]:
+			var currentDistance = 0;
+			currentDistance = firstPoint.distance_to(point);
+			if (currentDistance > distance):
+				distance = currentDistance;
+				furthestPoint = point;
+		return lerp(firstPoint,furthestPoint, 0.5);
+	else:
+		distance = 0;
+		return Vector3.ZERO;     
+# when no materials applied 
 func _make_intersection_plane():
-#		print("joining points ",_pointsAlongPlane[_current_surf_idx])
+#	print("joining points ",_pointsAlongPlane[_current_surf_idx])
+#	print("_make_intersection_plane")
 	var halfway = _get_plane_halfway_points();
 	for i in range(0,_pointsAlongPlane[_current_surf_idx].size(),2):
 		var firstVertex = _pointsAlongPlane[_current_surf_idx][i];
@@ -256,8 +324,9 @@ func _make_intersection_plane():
 			_set_mesh_side(MeshSide.Positive, halfway, -normal3, Vector2.ZERO, firstVertex, -normal3, Vector2.ZERO, secondVertex, -normal3, Vector2.ZERO, false, true);
 			_set_mesh_side(MeshSide.Negative, halfway, normal3, Vector2.ZERO, secondVertex, normal3, Vector2.ZERO, firstVertex, normal3, Vector2.ZERO, false, true);
 		else:
+			#changed the normal quickly
 			_set_mesh_side(MeshSide.Positive, halfway, normal3, Vector2.ZERO, secondVertex, normal3, Vector2.ZERO, firstVertex, normal3, Vector2.ZERO, false, true);
-			_set_mesh_side(MeshSide.Negative, halfway, -normal3, Vector2.ZERO, firstVertex, -normal3, Vector2.ZERO, secondVertex, -normal3, Vector2.ZERO, false, true);
+			_set_mesh_side(MeshSide.Negative, halfway, -normal3, Vector2.ZERO, firstVertex, -normal3, Vector2.ZERO, secondVertex, -normal3, Vector2.ZERO, false, true);   
 func _get_plane_halfway_points():
 	var distance 
 	if(_pointsAlongPlane[_current_surf_idx].size() > 0):
@@ -277,7 +346,7 @@ func _get_plane_halfway_points():
 #utility functions
 func _get_plane_intersection_point_uv(vertex1,vertex1Uv,vertex2,vertex2Uv, uv):
 	var pointOfintersection = _plane.intersects_segment(vertex2,vertex1)
-#		print("point of intersection for ",vertex2," ",vertex1," is ",pointOfintersection)
+#	print("point of intersection for ",vertex2.round()," ",vertex1.round()," is ",((pointOfintersection-_origin)/_scale).round())
 	var distance = pointOfintersection.distance_to(vertex1);
 	uv = _interpolate_uv(vertex1Uv, vertex2Uv, distance);
 	return (pointOfintersection-_origin)/_scale;
@@ -291,11 +360,8 @@ func _compute_normal(vertex1,vertex2,vertex3):
 	return normal;
 func _flip_normal(currentNormals):
 	var flippedNormals = [];
-
 	for normal in currentNormals:
 		flippedNormals.push_back(-normal);
-	
-
 	return flippedNormals
 func _smooth_vertex():
 	_smoothen(_positiveSideVertices, _positiveSideNormals, _positiveSideTriangles);
