@@ -1,7 +1,12 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=14 format=2]
 
 [ext_resource path="res://slicer/sliceable_geo.gd" type="Script" id=1]
 [ext_resource path="res://demo/slicer.gd" type="Script" id=2]
+
+[sub_resource type="SpatialMaterial" id=10]
+flags_unshaded = true
+params_cull_mode = 2
+albedo_color = Color( 0, 0.909804, 1, 1 )
 
 [sub_resource type="SpatialMaterial" id=13]
 flags_vertex_lighting = true
@@ -90,6 +95,7 @@ delete_at_children = 10
 _cut_body_collision_layer = 1
 _cut_body_collision_mask = 1
 _cut_body_gravity_scale = 1.0
+_cross_section_material = SubResource( 10 )
 
 [node name="MeshInstance" type="MeshInstance" parent="sliceable"]
 mesh = SubResource( 12 )

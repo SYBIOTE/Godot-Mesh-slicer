@@ -37,7 +37,7 @@ var _current_surf_idx:int
 var _origin:Vector3
 var _scale:Vector3
 
-func _init(plane:Plane , mesh:MeshInstance, cross_section_material:Material= null ,isSolid:bool = true, createReverseTriangleWindings:bool = false,shareVertices:bool = false, smoothVertices:bool =false):
+func _init(plane:Plane , mesh:MeshInstance,isSolid:bool = true, cross_section_material:Material= null , createReverseTriangleWindings:bool = false,shareVertices:bool = false, smoothVertices:bool =false):
 	if cross_section_material != null:
 		_cross_section_material = true
 		_isSolid = true

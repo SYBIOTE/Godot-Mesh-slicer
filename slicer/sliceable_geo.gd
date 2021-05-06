@@ -71,14 +71,14 @@ func _create_cut_body(_sign,mesh_instance,cutplane : Plane):
 #	rigid_body_half.apply_central_impulse(_sign*cutplane.normal*5)
 func cut_object(cutplane:Plane):
 	#  there are a lot of parameters for the constructor
-	#  cutplane:
-	#  _mesh
-	#	
-	#
-	#
-	#
-	#
-	var slices = slice_calculator.new(cutplane,_mesh,_cross_section_material,true)
+	#  cutplane = plane to cut mesh with , in global space
+	#  mesh =  the mesh you want to cut
+	#  is solid = if you want a surface for cross section
+	#  cross_section_material = cross section material you want for the cut pieces , overides is_solid to be true
+	#  createReverseTriangleWindings 
+	#  shareVertices
+	#  smoothVertices
+	var slices = slice_calculator.new(cutplane,_mesh,true,_cross_section_material)
 #	print("+ve mesh is ",slices.negative_mesh())
 #	print("-ve mesh is ",slices.positive_mesh())
 	_create_cut_body(-1,slices.negative_mesh(),cutplane);
