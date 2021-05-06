@@ -68,7 +68,7 @@ func _create_cut_body(_sign,mesh_instance,cutplane : Plane):
 	rigid_body_half.delete_at_children =  delete_at_children
 	rigid_body_half._cross_section_material = _cross_section_material
 	get_parent().add_child(rigid_body_half)
-	rigid_body_half.apply_central_impulse(_sign*cutplane.normal*5)
+#	rigid_body_half.apply_central_impulse(_sign*cutplane.normal*5)
 func cut_object(cutplane:Plane):
 	#  there are a lot of parameters for the constructor
 	#  cutplane:

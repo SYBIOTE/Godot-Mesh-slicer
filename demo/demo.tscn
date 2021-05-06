@@ -1,11 +1,7 @@
-[gd_scene load_steps=14 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://slicer/sliceable_geo.gd" type="Script" id=1]
 [ext_resource path="res://demo/slicer.gd" type="Script" id=2]
-
-[sub_resource type="SpatialMaterial" id=10]
-params_cull_mode = 2
-albedo_color = Color( 0, 0.909804, 1, 1 )
 
 [sub_resource type="SpatialMaterial" id=13]
 flags_vertex_lighting = true
@@ -35,6 +31,7 @@ points = PoolVector3Array( 1, 0, 1, -1, 0, 1, 1, 0, -1, -1, 0, -1 )
 
 [sub_resource type="Animation" id=7]
 resource_name = "cut"
+length = 4.0
 tracks/0/type = "value"
 tracks/0/path = NodePath("Area:translation")
 tracks/0/interp = 1
@@ -45,7 +42,7 @@ tracks/0/keys = {
 "times": PoolRealArray( 0, 0.9, 1.2, 2, 2.4, 2.7, 2.9, 3.4, 4 ),
 "transitions": PoolRealArray( 1, 1, 1, 1, 1, 1, 1, 1, 1 ),
 "update": 0,
-"values": [ Vector3( 0, 1.12632, 1.13555 ), Vector3( 0, 1.12632, -6.63127 ), Vector3( 0, 1.12632, -6.63127 ), Vector3( 0, 0.43, 1.013 ), Vector3( -3.40782, 2.22066, 1.013 ), Vector3( -4.71001, 2.90491, 0.0462437 ), Vector3( 3.9962, -0.725932, -6.40486 ), Vector3( 3.75535, 2.01234, -5.38397 ), Vector3( 0, 1.12632, 1.13555 ) ]
+"values": [ Vector3( 0, 1.126, 5 ), Vector3( 0, 1.12632, -6.63127 ), Vector3( 0, 1.12632, -6.63127 ), Vector3( 0, 0.43, 1.013 ), Vector3( -3.40782, 2.22066, 1.013 ), Vector3( -4.71001, 2.90491, 0.0462437 ), Vector3( 3.9962, -0.725932, -6.40486 ), Vector3( 3.75535, 2.01234, -5.38397 ), Vector3( 0, 1.12632, 1.13555 ) ]
 }
 tracks/1/type = "value"
 tracks/1/path = NodePath("Area:rotation_degrees")
@@ -84,16 +81,15 @@ size = Vector2( 20, 20 )
 [node name="env" type="Spatial"]
 
 [node name="Camera" type="Camera" parent="."]
-transform = Transform( 1, 0, 0, 0, 0.27708, 0.960847, 0, -0.960847, 0.27708, 0, 5.72898, 0.974048 )
+transform = Transform( 1, 0, 0, 0, 0.985497, 0.169693, 0, -0.169693, 0.985497, 0, 1.947, 4.746 )
 
 [node name="sliceable" type="RigidBody" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -2.12055 )
 script = ExtResource( 1 )
 delete_at_children = 10
 _cut_body_collision_layer = 1
 _cut_body_collision_mask = 1
-_cut_body_gravity_scale = 2.0
-_cross_section_material = SubResource( 10 )
+_cut_body_gravity_scale = 1.0
 
 [node name="MeshInstance" type="MeshInstance" parent="sliceable"]
 mesh = SubResource( 12 )
@@ -103,17 +99,20 @@ material/0 = null
 shape = SubResource( 3 )
 
 [node name="Area" type="Area" parent="."]
-transform = Transform( 0.999999, 0, 0, 0, -4.37113e-08, -0.999999, 0, 0.999999, -4.37113e-08, -5, 1, 0 )
+transform = Transform( 0.999999, 0, 0, 0, 0.999999, 0, 0, 0, 0.999999, 0, 1.126, 5 )
 script = ExtResource( 2 )
 
 [node name="mesh" type="MeshInstance" parent="Area"]
 mesh = SubResource( 5 )
 material/0 = null
 
-[node name="tip" type="Position3D" parent="Area/mesh"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1 )
+[node name="A" type="Position3D" parent="Area/mesh"]
+transform = Transform( 1, 5.96046e-08, 0, -5.96046e-08, 1, 0, 0, 0, 1, 1, 0, 1 )
 
-[node name="base" type="Position3D" parent="Area/mesh"]
+[node name="B" type="Position3D" parent="Area/mesh"]
+transform = Transform( 1, 5.96046e-08, 0, -5.96046e-08, 1, 0, 0, 0, 1, 1, 0, -1 )
+
+[node name="C" type="Position3D" parent="Area/mesh"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -1 )
 
 [node name="CollisionShape" type="CollisionShape" parent="Area"]
@@ -121,7 +120,7 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.361122, -0.300545, 0 )
 shape = SubResource( 6 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-autoplay = "top_cut"
+autoplay = "cut"
 anims/cut = SubResource( 7 )
 anims/top_cut = SubResource( 11 )
 
@@ -138,5 +137,4 @@ material/0 = null
 [node name="DirectionalLight" type="DirectionalLight" parent="."]
 transform = Transform( 1, 0, 0, 0, 0.782728, 0.622364, 0, -0.622364, 0.782728, 0, 0, 0 )
 
-[connection signal="body_entered" from="Area" to="Area" method="_on_Area_body_entered"]
 [connection signal="body_exited" from="Area" to="Area" method="_on_Area_body_exited"]
