@@ -14,9 +14,10 @@ There will a new node under rigid body called , sliceable.
 The sliceable node needs a mesh instance with mesh   
 and a empty collision shape under it to function.     
 Provide a cutting plane to the cut_object function (in world space).   
-This will cut the rigid body into two rigidbodies.    
+This will cut the rigid body into two rigidbodies.   
+
+added cross section materials
 ## Todo 
-add cross section textures  
 improve normal calculation
 
 ## Bugs 
