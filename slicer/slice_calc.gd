@@ -282,9 +282,7 @@ func _make_intersection_plane_cross_section():
 #	print("_make_intersection_plane_cross_section")
 	var max_points_surface = 0
 	for i in _pointsAlongPlane.size():
-		if _pointsAlongPlane[i].size()>_pointsAlongPlane[max_points_surface].size():
-			max_points_surface = i
-	_pointsAlongPlane[_surfaceCount-1] = _pointsAlongPlane[max_points_surface]
+		_pointsAlongPlane[_surfaceCount-1] += _pointsAlongPlane[i]
 	var halfway = _get_plane_halfway_points_cross_section();
 	for i in range(0,_pointsAlongPlane[_surfaceCount-1].size(),2):
 		var firstVertex:Vector3 = _pointsAlongPlane[_surfaceCount-1][i];
@@ -293,6 +291,7 @@ func _make_intersection_plane_cross_section():
 #		print(firstVertex.round(),secondVertex.round(),halfway.round())
 		var direction = normal3.dot(_plane.normal);
 		_set_mesh_side(MeshSide.OnPlane, halfway, normal3, Vector2.ZERO, firstVertex, normal3, Vector2.ZERO, secondVertex, normal3, Vector2.ZERO, false, true);
+	_pointsAlongPlane.clear()
 func _get_plane_halfway_points_cross_section():
 #	print("_get_plane_halfway_points_cross_section")
 	var distance 
