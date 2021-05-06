@@ -1,21 +1,24 @@
-[gd_scene load_steps=14 format=2]
+[gd_scene load_steps=16 format=2]
 
 [ext_resource path="res://slicer/sliceable_geo.gd" type="Script" id=1]
 [ext_resource path="res://demo/slicer.gd" type="Script" id=2]
+[ext_resource path="res://demo/wood.jpeg" type="Texture" id=3]
+[ext_resource path="res://demo/Camera.gd" type="Script" id=4]
 
 [sub_resource type="SpatialMaterial" id=1]
 params_cull_mode = 2
-albedo_color = Color( 0, 0.909804, 1, 1 )
+albedo_texture = ExtResource( 3 )
 
 [sub_resource type="SpatialMaterial" id=2]
-flags_vertex_lighting = true
-vertex_color_use_as_albedo = true
-vertex_color_is_srgb = true
+flags_ensure_correct_normals = true
 params_cull_mode = 2
 albedo_color = Color( 1, 0, 0, 1 )
 
 [sub_resource type="CubeMesh" id=3]
 material = SubResource( 2 )
+subdivide_width = 3
+subdivide_height = 3
+subdivide_depth = 3
 
 [sub_resource type="ConvexPolygonShape" id=4]
 points = PoolVector3Array( -1, 1, 1, 1, 1, -1, 1, 1, 1, -1, 1, -1, -1, -1, 1, 1, -1, -1, 1, -1, 1, -1, -1, -1, 1, 1, 1, -1, 1, -1, 1, 1, -1, -1, 1, 1, 1, -1, 1, -1, -1, -1, 1, -1, -1, -1, -1, 1, 1, 1, 1, -1, -1, 1, -1, 1, 1, 1, -1, 1, 1, 1, -1, -1, -1, -1, -1, 1, -1, 1, -1, -1 )
@@ -83,13 +86,11 @@ size = Vector2( 20, 20 )
 
 [node name="env" type="Spatial"]
 
-[node name="Camera" type="Camera" parent="."]
-transform = Transform( 1, 0, 0, 0, 0.985497, 0.169693, 0, -0.169693, 0.985497, 0, 1.947, 4.746 )
-
 [node name="sliceable" type="RigidBody" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -2.12055 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -0.174349 )
 script = ExtResource( 1 )
-delete_at_children = 10
+_delete_at_children = 10
+_disable_at_children = 10
 _cut_body_collision_layer = 1
 _cut_body_collision_mask = 1
 _cut_body_gravity_scale = 1.0
@@ -105,7 +106,7 @@ material/0 = null
 shape = SubResource( 4 )
 
 [node name="Area" type="Area" parent="."]
-transform = Transform( 0.999999, 0, 0, 0, 0.999999, 0, 0, 0, 0.999999, 0, 1.126, 5 )
+transform = Transform( 0.999999, 0, 0, 0, 0.622869, -0.782325, 0, 0.782325, 0.622869, -5, 1, 0 )
 script = ExtResource( 2 )
 
 [node name="mesh" type="MeshInstance" parent="Area"]
@@ -126,7 +127,7 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.361122, -0.300545, 0 )
 shape = SubResource( 7 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-autoplay = "cut"
+autoplay = "top_cut"
 anims/cut = SubResource( 8 )
 anims/top_cut = SubResource( 9 )
 
@@ -141,6 +142,15 @@ mesh = SubResource( 11 )
 material/0 = null
 
 [node name="DirectionalLight" type="DirectionalLight" parent="."]
-transform = Transform( 1, 0, 0, 0, 0.782728, 0.622364, 0, -0.622364, 0.782728, 0, 0, 0 )
+transform = Transform( 1, 0, 0, 0, 0.588816, 0.808267, 0, -0.808267, 0.588816, 0, 4.14403, 0 )
+
+[node name="Position3D" type="Position3D" parent="."]
+
+[node name="Camera" type="Camera" parent="Position3D"]
+transform = Transform( 1, 0, 0, 0, 0.985497, 0.169693, 0, -0.169693, 0.985497, 0, 1.947, 4.746 )
+script = ExtResource( 4 )
+DEFAULT_DISTANCE = 5.0
+ROTATE_SPEED = 4.0
+ANCHOR_NODE_PATH = NodePath("..")
 
 [connection signal="body_exited" from="Area" to="Area" method="_on_Area_body_exited"]
