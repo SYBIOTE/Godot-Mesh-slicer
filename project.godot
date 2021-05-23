@@ -12,12 +12,12 @@ _global_script_classes=[ {
 "base": "Reference",
 "class": "slice_calculator",
 "language": "GDScript",
-"path": "res://slicer/slice_calc.gd"
+"path": "res://addons/slicer/slice_calc.gd"
 }, {
 "base": "RigidBody",
 "class": "sliceable",
 "language": "GDScript",
-"path": "res://slicer/sliceable_geo.gd"
+"path": "res://addons/slicer/sliceable_geo.gd"
 } ]
 _global_script_class_icons={
 "slice_calculator": "",
