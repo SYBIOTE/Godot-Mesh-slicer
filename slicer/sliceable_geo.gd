@@ -8,6 +8,8 @@ export (int,LAYERS_3D_PHYSICS) var _cut_body_collision_layer
 export (int,LAYERS_3D_PHYSICS) var _cut_body_collision_mask
 export var _cut_body_gravity_scale:float
 export (Material)var _cross_section_material =  null
+export var _cross_section_texture_UV_scale:float = 1
+export var _cross_section_texture_UV_offset:Vector2 = Vector2(0,0)
 export var _apply_force_on_cut:bool = false
 export var _normal_force_on_cut:float  = 1
 var _current_child_number = 0
@@ -85,12 +87,14 @@ func cut_object(cutplane:Plane):
 	#  mesh =  the mesh you want to cut
 	#  is solid = if you want a surface for cross section
 	#  cross_section_material = cross section material you want for the cut pieces , overides is_solid to be true
+	#  cross section texture UV scale , scale of the planar projection UV
+	#  cross section texture UV offset , offset of the Planar projection UV
 	#  createReverseTriangleWindings 
 	#  shareVertices
 	#  smoothVertices
 	#-------------------------------------------------
 	if enabled: 
-		var slices = slice_calculator.new(cutplane,_mesh,true,_cross_section_material,true,true,true)
+		var slices = slice_calculator.new(cutplane,_mesh,true,_cross_section_material,_cross_section_texture_UV_scale,_cross_section_texture_UV_offset,true,true,true)
 	#	print("+ve mesh is ",slices.negative_mesh())
 	#	print("-ve mesh is ",slices.positive_mesh())
 		_create_cut_body(-1,slices.negative_mesh(),cutplane);

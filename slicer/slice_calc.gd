@@ -28,6 +28,8 @@ var _onplaneSideNormals;
 var _plane:Plane;
 var _mesh:MeshInstance;
 var _cross_section_material:bool = false;
+var _UV_scale
+var _UV_offset
 
 var _isSolid:bool;
 var _useSharedVertices:bool;
@@ -37,7 +39,7 @@ var _current_surf_idx:int
 var _origin:Vector3
 var _scale:Vector3
 
-func _init(plane:Plane , mesh:MeshInstance,isSolid:bool = true, cross_section_material:Material= null , createReverseTriangleWindings:bool = false,shareVertices:bool = false, smoothVertices:bool =false):
+func _init(plane:Plane , mesh:MeshInstance,isSolid:bool = true, cross_section_material:Material= null,uv_scale = 1,uv_offset = Vector2(0,0),createReverseTriangleWindings:bool = false,shareVertices:bool = false, smoothVertices:bool =false):
 	if cross_section_material != null:
 		_cross_section_material = true
 		_isSolid = true
@@ -47,6 +49,8 @@ func _init(plane:Plane , mesh:MeshInstance,isSolid:bool = true, cross_section_ma
 		_onplaneSideNormals=[];
 	if _cross_section_material:
 		_surfaceCount = mesh.mesh.get_surface_count()+1
+		_UV_scale = uv_scale
+		_UV_offset = uv_offset
 	else:
 		_surfaceCount = mesh.mesh.get_surface_count()
 	_current_surf_idx = 0 
@@ -302,10 +306,12 @@ func _make_intersection_plane_cross_section():
 	for i in range(0,_pointsAlongPlane[_surfaceCount-1].size(),2):
 		var firstVertex:Vector3 = _pointsAlongPlane[_surfaceCount-1][i];
 		var secondVertex:Vector3 = _pointsAlongPlane[_surfaceCount-1][i+1];
-		var normal3 = -_compute_normal(halfway, secondVertex, firstVertex).normalized();
-#		print(firstVertex.round(),secondVertex.round(),halfway.round())
+		var normal3 = _compute_normal(halfway, secondVertex, firstVertex).normalized();
 		var direction = normal3.dot(_plane.normal);
-		_set_mesh_side(MeshSide.OnPlane, halfway, normal3,Vector2.ZERO,firstVertex,normal3,Vector2.ZERO,secondVertex,normal3,Vector2.ZERO,false,true);
+		if direction<0:
+			_set_mesh_side(MeshSide.OnPlane, halfway, normal3,_planar_UV(halfway,normal3),firstVertex,normal3,_planar_UV(firstVertex,normal3),secondVertex,normal3,_planar_UV(secondVertex,normal3),false,true);
+		else:
+			_set_mesh_side(MeshSide.OnPlane, halfway, -normal3,_planar_UV(halfway,-normal3),firstVertex,-normal3,_planar_UV(firstVertex,-normal3),secondVertex,-normal3,_planar_UV(secondVertex,-normal3),false,true);
 	_pointsAlongPlane.clear()
 func _get_plane_halfway_points_cross_section():
 #	print("_get_plane_halfway_points_cross_section")
@@ -358,6 +364,15 @@ func _get_plane_halfway_points():
 		distance = 0;
 		return Vector3.ZERO;      
 #utility functions
+func _planar_UV(vertex,projection_axis):
+	var U :Vector3 = projection_axis.cross(Vector3(0,0,1))
+	if U.dot(U)<.001:
+		U = Vector3(1,0,0)
+	else:
+		U = U.normalized()
+	var V = projection_axis.cross(U).normalized()
+	return Vector2(vertex.dot(U)+_UV_offset.x,vertex.dot(V)+_UV_offset.y)*_UV_scale
+	
 func _get_plane_intersection_point_uv(vertex1,vertex1Uv,vertex2,vertex2Uv, uv):
 	var pointOfintersection = _plane.intersects_segment(vertex2,vertex1)
 #	print("point of intersection for ",vertex2.round()," ",vertex1.round()," is ",((pointOfintersection-_origin)/_scale).round())
