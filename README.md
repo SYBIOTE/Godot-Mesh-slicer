@@ -21,5 +21,4 @@ added cross section materials
 improve normal calculation
 
 ## Bugs 
-cuurently the sliced objects have the same materials but the applied textures on the material seem to be missing  
-(might be linked to UV calculation) 
+bit of texture UV distortion on the newly generated vertices 
