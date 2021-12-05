@@ -17,8 +17,7 @@ Provide a cutting plane to the cut_object function (in world space).
 This will cut the rigid body into two rigidbodies.   
 
 added cross section materials
-## Todo 
-improve normal calculation
 
 ## Bugs 
-bit of texture UV distortion on the newly generated vertices 
+bit of texture / UV distortion on the newly generated vertices
+
